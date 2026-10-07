@@ -1,0 +1,417 @@
+[
+  {
+    "field_name": "Workload Number",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "418"
+  },
+  {
+    "field_name": "Workload Name",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "cuDNN Convolution Microbenchmark"
+  },
+  {
+    "field_name": "GPU Vendor",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "NVIDIA"
+  },
+  {
+    "field_name": "Repo Name",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "gpu-bench-nvidia-cudnn-convolution-micro-ubu2604"
+  },
+  {
+    "field_name": "Main Goal",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Measure cuDNN convolution solver speed"
+  },
+  {
+    "field_name": "Validation Objective",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Validates cuDNN convolution timing and TFLOPS from bin/cudnn_conv. Requires a discoverable cudnn.h and libcudnn"
+  },
+  {
+    "field_name": "Metrics",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "#1: Convolution kernel execution time, forward (kernel_time_msec); #2: Achieved compute throughput, forward (tflops_fwd); #3: Memory bandwidth, GB/s, forward (memory_bandwidth_gb_s); #4: Solver search time (solver_search_msec), sum of cudnnFind wall time across the directions run"
+  },
+  {
+    "field_name": "Command Tools Executed",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Compile cudnn_conv.cu with nvcc -lcudnn; run bin/cudnn_conv twice via collect_cudnn_conv.py"
+  },
+  {
+    "field_name": "Command Execution Details and Purpose",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Compile src/cudnn_conv.cu with nvcc -lcudnn (requires cudnn.h on the default include path) and run bin/cudnn_conv twice on synthetic tensors. The harness runs FP16 tensor-op convolutions with same padding (kernel/2) and, per direction (fwd, bwd-data, bwd-weights), times cudnnFind algorithm search and the selected algorithm's kernel"
+  },
+  {
+    "field_name": "Command Methodology",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Compile src/cudnn_conv.cu with nvcc -lcudnn and run bin/cudnn_conv twice. For forward, backward-data, and backward-weights, time cudnnFind and the selected FP16 tensor-op kernel. The headline kernel time, forward TFLOPS, and bandwidth are the forward direction"
+  },
+  {
+    "field_name": "Execution Description With Parameters",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Builds src/cudnn_conv.cu (includes <cudnn.h>) into bin/cudnn_conv and times forward/backward convolution on synthetic tensors. dtype default FP16. conv_direction, batch_size, input_channels, input_height/width, output_channels, kernel_height/width, stride_h/w, group_count, search_strategy, warmup_iters, and num_iterations come from yaml. Collector runs the harness twice (pass1/pass2/summary)"
+  },
+  {
+    "field_name": "Execution Domain",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "GPU Compute / CUDA"
+  },
+  {
+    "field_name": "Workload Category",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Compute & Math Kernels"
+  },
+  {
+    "field_name": "Workload Type",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Benchmark"
+  },
+  {
+    "field_name": "Target Hardware",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "GPU"
+  },
+  {
+    "field_name": "GPU Model",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "H100 SXM 80GB"
+  },
+  {
+    "field_name": "Raw Output Format",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "cuDNN convolution CSV from collect_cudnn_conv.py. Forward and both backward directions share one row"
+  },
+  {
+    "field_name": "Primary Record Granularity",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "one row for the convolution configuration"
+  },
+  {
+    "field_name": "Raw Output Example",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "check,status,dtype,input_source,conv_direction,batch_size,input_channels,input_height,input_width,output_channels,kernel_height,kernel_width,stride_h,stride_w,group_count,search_strategy,warmup_iters,num_iterations,pad_h,pad_w,dtype_effective,kernel_time_msec,tflops_fwd,tflops_bwd_data,tflops_bwd_weights,solver_search_msec,memory_bandwidth_gb_s,kernel_time_msec_bwd_data,kernel_time_msec_bwd_weights,memory_bandwidth_gb_s_bwd_data,memory_bandwidth_gb_s_bwd_weights,algo_fwd,algo_bwd_data,algo_bwd_weights"
+  },
+  {
+    "field_name": "run_benchmark Command Plus Options for Smoke Run",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "bash run_benchmark.sh --smoke --validate --dtype FP16 --input-source synthetic --conv-direction all --batch-size 1 --input-channels 8 --input-height 16 --input-width 16 --output-channels 8 --kernel-height 3 --kernel-width 3 --stride-h 1 --stride-w 1 --group-count 1 --search-strategy find --warmup-iters 1 --num-iterations 2"
+  },
+  {
+    "field_name": "run_benchmark Command Plus Options for Baseline Run",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "bash run_benchmark.sh --baseline --validate --dtype FP16 --input-source synthetic --conv-direction all --batch-size 32 --input-channels 3 --input-height 224 --input-width 224 --output-channels 64 --kernel-height 3 --kernel-width 3 --stride-h 1 --stride-w 1 --group-count 1 --search-strategy find --warmup-iters 5 --num-iterations 85000"
+  },
+  {
+    "field_name": "run_benchmark Command Plus Options for Extended Run",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "bash run_benchmark.sh --extended --validate --dtype FP16 --input-source synthetic --conv-direction all --batch-size 32 --input-channels 3 --input-height 224 --input-width 224 --output-channels 64 --kernel-height 3 --kernel-width 3 --stride-h 1 --stride-w 1 --group-count 1 --search-strategy find --warmup-iters 10 --num-iterations 250000"
+  },
+  {
+    "field_name": "Output Fields / Metrics to Parse",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "kernel_time_msec, tflops_fwd, tflops_bwd_data, tflops_bwd_weights, solver_search_msec, memory_bandwidth_gb_s, kernel_time_msec_bwd_data, kernel_time_msec_bwd_weights, memory_bandwidth_gb_s_bwd_data, memory_bandwidth_gb_s_bwd_weights, algo_fwd, algo_bwd_data, algo_bwd_weights, dtype_effective"
+  },
+  {
+    "field_name": "Success Criteria",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Both timed passes exit 0 and the summary row has positive forward kernel time and TFLOPS"
+  },
+  {
+    "field_name": "Parser and Normalization Notes",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "RESULT lines fill one wide row. Forward, backward-data, and backward-weight times and bandwidths share that row. pass1, pass2, and summary are the two passes plus their mean"
+  },
+  {
+    "field_name": "Hardware Config",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "NVIDIA H100 SXM host (20+ vCPUs, 128+ GB RAM, local NVMe), 1x H100 SXM (80 GB HBM3, sm_90, 132 SMs)"
+  },
+  {
+    "field_name": "GPU Architecture",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "sm_90 (NVIDIA Hopper H100)"
+  },
+  {
+    "field_name": "Framework",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Bash, SQLite, Python, PyYAML, CUDA Runtime, NVCC, cuDNN"
+  },
+  {
+    "field_name": "OS Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Ubuntu 26.04"
+  },
+  {
+    "field_name": "Kernel Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "kernel 7.0.0"
+  },
+  {
+    "field_name": "Runtime Language",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "C++"
+  },
+  {
+    "field_name": "Container Base Image",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - host-native Ubuntu 26.04"
+  },
+  {
+    "field_name": "Python Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Python 3.14.4"
+  },
+  {
+    "field_name": "GPU Runtime Version (was ROCm Version)",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "CUDA 13.3"
+  },
+  {
+    "field_name": "BLAS Version (was rocBLAS version)",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - rocBLAS not used"
+  },
+  {
+    "field_name": "Mistral-7B Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - Mistral not used"
+  },
+  {
+    "field_name": "PyTorch Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - PyTorch not used"
+  },
+  {
+    "field_name": "torchvision Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - torchvision not used"
+  },
+  {
+    "field_name": "vLLM Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - vLLM not used"
+  },
+  {
+    "field_name": "vLLM Wheel/Source Index",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - vLLM not used"
+  },
+  {
+    "field_name": "SGLang Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - SGLang not used"
+  },
+  {
+    "field_name": "SGLang Repository/Commit",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - SGLang not used"
+  },
+  {
+    "field_name": "Cmake Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - CMake not used"
+  },
+  {
+    "field_name": "g++ Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - CMake not used"
+  },
+  {
+    "field_name": "Known Runtime Constraints (<=35 Words Each)",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "cudnn.h must be on the nvcc default include path. Solver choice varies by shape and dtype; warm-up is recommended"
+  },
+  {
+    "field_name": "Parameter_01",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "dtype"
+  },
+  {
+    "field_name": "Parameter_02",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "input_source"
+  },
+  {
+    "field_name": "Parameter_03",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "conv_direction"
+  },
+  {
+    "field_name": "Parameter_04",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "batch_size"
+  },
+  {
+    "field_name": "Parameter_05",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "input_channels"
+  },
+  {
+    "field_name": "Parameter_06",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "input_height"
+  },
+  {
+    "field_name": "Parameter_07",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "input_width"
+  },
+  {
+    "field_name": "Parameter_08",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "output_channels"
+  },
+  {
+    "field_name": "Parameter_09",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "kernel_height"
+  },
+  {
+    "field_name": "Parameter_10",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "kernel_width"
+  },
+  {
+    "field_name": "Parameter_11",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "stride_h"
+  },
+  {
+    "field_name": "Parameter_12",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "stride_w"
+  },
+  {
+    "field_name": "Parameter_13",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "group_count"
+  },
+  {
+    "field_name": "Parameter_14",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "search_strategy"
+  },
+  {
+    "field_name": "Parameter_15",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "warmup_iters"
+  },
+  {
+    "field_name": "Parameter_16",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "num_iterations"
+  },
+  {
+    "field_name": "Parameter_17",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "-"
+  },
+  {
+    "field_name": "Parameter_18",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "-"
+  },
+  {
+    "field_name": "Parameter_19",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "-"
+  },
+  {
+    "field_name": "Parameter_20",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "-"
+  },
+  {
+    "field_name": "GPU Architecutre ID",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "sm_90"
+  },
+  {
+    "field_name": "GPU Kernel Execution Runtime (HIP or CUDA)",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "CUDA"
+  },
+  {
+    "field_name": "System Monitoring Tool",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "nvidia-smi / DCGM"
+  },
+  {
+    "field_name": "Validation & Diagnostics Suite",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - NVIDIA DCGM Diagnostics not used"
+  },
+  {
+    "field_name": "Collective Communication Library",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - NCCL not used"
+  },
+  {
+    "field_name": "Convolution or DNN Library",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "cuDNN"
+  },
+  {
+    "field_name": "Benchmark Schema Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "1.3.0"
+  },
+  {
+    "field_name": "Schema Last Updated",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "2026-08-16"
+  },
+  {
+    "field_name": "Installation and Execution Summary",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Compile src/cudnn_conv.cu with nvcc -lcudnn (requires cudnn.h on the default include path) and run bin/cudnn_conv twice on synthetic tensors. The harness runs FP16 tensor-op convolutions with same padding (kernel/2) and, per direction (fwd, bwd-data, bwd-weights), times cudnnFind algorithm search and the selected algorithm's kernel"
+  },
+  {
+    "field_name": "Workload Command Line Executable",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Compile cudnn_conv.cu with nvcc -lcudnn; run bin/cudnn_conv twice via collect_cudnn_conv.py"
+  },
+  {
+    "field_name": "ROCm Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "CUDA 13.3"
+  },
+  {
+    "field_name": "rocBLAS Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "N/A - rocBLAS not used"
+  },
+  {
+    "field_name": "Execution Summary (Run and Measure)",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Compile src/cudnn_conv.cu with nvcc -lcudnn (requires cudnn.h on the default include path) and run bin/cudnn_conv twice on synthetic tensors. The harness runs FP16 tensor-op convolutions with same padding (kernel/2) and, per direction (fwd, bwd-data, bwd-weights), times cudnnFind algorithm search and the selected algorithm's kernel"
+  },
+  {
+    "field_name": "nVidia Porting Instructions (Reference Only)",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Native NVIDIA CUDA workload. Execute on the stated Ubuntu release with the host NVIDIA driver and CUDA userspace. ROCm porting notes do not apply."
+  },
+  {
+    "field_name": "AMD nVidia Applicable",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "NVIDIA"
+  },
+  {
+    "field_name": "Model Context Protocols",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "None"
+  },
+  {
+    "field_name": "Profile Parameter Values",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Parameters_SmokeBaselineExtend",
+    "value": "{\"dtype\": {\"smoke\": \"FP16\", \"baseline\": \"FP16\", \"extended\": \"FP16\", \"notes\": \"\"}, \"input_source\": {\"smoke\": \"synthetic\", \"baseline\": \"synthetic\", \"extended\": \"synthetic\", \"notes\": \"\"}, \"conv_direction\": {\"smoke\": \"all\", \"baseline\": \"all\", \"extended\": \"all\", \"notes\": \"\"}, \"batch_size\": {\"smoke\": \"1\", \"baseline\": \"32\", \"extended\": \"32\", \"notes\": \"\"}, \"input_channels\": {\"smoke\": \"8\", \"baseline\": \"3\", \"extended\": \"3\", \"notes\": \"\"}, \"input_height\": {\"smoke\": \"16\", \"baseline\": \"224\", \"extended\": \"224\", \"notes\": \"\"}, \"input_width\": {\"smoke\": \"16\", \"baseline\": \"224\", \"extended\": \"224\", \"notes\": \"\"}, \"output_channels\": {\"smoke\": \"8\", \"baseline\": \"64\", \"extended\": \"64\", \"notes\": \"\"}, \"kernel_height\": {\"smoke\": \"3\", \"baseline\": \"3\", \"extended\": \"3\", \"notes\": \"\"}, \"kernel_width\": {\"smoke\": \"3\", \"baseline\": \"3\", \"extended\": \"3\", \"notes\": \"\"}, \"stride_h\": {\"smoke\": \"1\", \"baseline\": \"1\", \"extended\": \"1\", \"notes\": \"\"}, \"stride_w\": {\"smoke\": \"1\", \"baseline\": \"1\", \"extended\": \"1\", \"notes\": \"\"}, \"group_count\": {\"smoke\": \"1\", \"baseline\": \"1\", \"extended\": \"1\", \"notes\": \"\"}, \"search_strategy\": {\"smoke\": \"find\", \"baseline\": \"find\", \"extended\": \"find\", \"notes\": \"search_strategy=find is Find mode, not -S 1. Omit -S unless a solution id is explicit.\"}, \"warmup_iters\": {\"smoke\": \"1\", \"baseline\": \"5\", \"extended\": \"10\", \"notes\": \"\"}, \"num_iterations\": {\"smoke\": \"2\", \"baseline\": \"85000\", \"extended\": \"250000\", \"notes\": \"H100 2026-10-04: 168000 baseline was 7:50 and 514000 extended was 23:50. 100000 targets about 4:40. 320000 targets about 14:50.\"}}"
+  },
+  {
+    "field_name": "Profile Command Authorship",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Parameters_SmokeBaselineExtend",
+    "value": "Workload_Definitions run_benchmark command columns are generated from Parameters_SmokeBaselineExtend. Author parameter values on the Parameters_SmokeBaselineExtend sheet only. Do not invent smoke/baseline/extended sweep numbers. Sweep/list flags in the command cells are documentary; omit those flags so config/benchmark_config.yaml expands cases."
+  }
+]
