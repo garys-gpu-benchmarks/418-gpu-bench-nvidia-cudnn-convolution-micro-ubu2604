@@ -88,6 +88,12 @@ def _match_any(text: str, needles: list[str]) -> bool:
         token = str(needle).strip().lower()
         if not token:
             continue
+        # "perf" is a substring of "iperf" / "iperf3". A bare substring match
+        # would install linux-tools for an iPerf workload.
+        if token == "perf":
+            if re.search(r"(?<![a-z0-9])perf(?![a-z0-9])", blob):
+                return True
+            continue
         if re.search(rf"(^|[,;:\s/]){re.escape(token)}([,;:\s/]|$)", blob) or token in blob:
             return True
     return False

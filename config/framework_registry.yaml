@@ -86,4 +86,3 @@ vendors:
         include: [lmbench]
       BENCHMARK_INSTALL_PERF:
         include: [perf, linux perf, pmu]
-        exclude: [iperf3, iperf]

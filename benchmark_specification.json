@@ -15,6 +15,11 @@
     "value": "NVIDIA"
   },
   {
+    "field_name": "OS Version",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Ubuntu 26.04"
+  },
+  {
     "field_name": "Repo Name",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "gpu-bench-nvidia-cudnn-convolution-micro-ubu2604"
@@ -138,11 +143,6 @@
     "field_name": "Framework",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "Bash, SQLite, Python, PyYAML, CUDA Runtime, NVCC, cuDNN"
-  },
-  {
-    "field_name": "OS Version",
-    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "Ubuntu 26.04"
   },
   {
     "field_name": "Kernel Version",

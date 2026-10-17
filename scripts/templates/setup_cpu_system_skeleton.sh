@@ -140,17 +140,47 @@ fi
 if [[ "${BENCHMARK_INSTALL_PERF}" == "1" ]]; then
   # linux-tools-generic follows the newest archive kernel and pulls its image
   # and headers. Those postinst scripts build DKMS for a kernel that is not running.
-  # Install linux-tools-$(uname -r) only when this Ubuntu archive publishes it.
   apt_install linux-tools-common
   KERNEL_RELEASE="$(uname -r)"
+  # Cloud kernels are often absent from this Ubuntu archive. The collector
+  # records PMU metrics as na when versioned perf is missing.
   if apt-cache show "linux-tools-${KERNEL_RELEASE}" >/dev/null 2>&1; then
     apt_install "linux-tools-${KERNEL_RELEASE}"
   else
-    log_status "WARN linux-tools-${KERNEL_RELEASE} is not in apt; continuing without versioned perf"
+    log_status "WARN linux-tools-${KERNEL_RELEASE} is not in the apt archive; continuing without versioned perf"
   fi
 fi
 
+if [[ -f benchmark_specification.json ]]; then
+  gpu_vendor="$("${BENCHMARK_PYTHON:-python3}" - <<'PY'
+import json
+from pathlib import Path
+fields = {
+    item.get("field_name", ""): str(item.get("value", ""))
+    for item in json.loads(Path("benchmark_specification.json").read_text(encoding="utf-8"))
+}
+print(fields.get("GPU Vendor", ""))
+PY
+  )"
+fi
+
 PYTHON_BIN="${BENCHMARK_PYTHON:-python3}"
+if grep -Eiq 'amd' <<< "${gpu_vendor:-}"; then
+  # shellcheck disable=SC1091
+  source "${REPO_ROOT}/scripts/lib/uv_python_314.sh"
+  ensure_uv_python_314 || {
+    echo "[FAIL] uv could not install CPython 3.14 for the AMD benchmark virtualenv." >&2
+    exit 1
+  }
+  PYTHON_BIN="${UV_PYTHON}"
+fi
+if [[ -x "${REPO_ROOT}/.venv/bin/python" ]]; then
+  existing_py="$("${REPO_ROOT}/.venv/bin/python" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+  wanted_py="$("${PYTHON_BIN}" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+  if [[ "${existing_py}" != "${wanted_py}" ]]; then
+    rm -rf "${REPO_ROOT}/.venv"
+  fi
+fi
 if [[ ! -x "${REPO_ROOT}/.venv/bin/python" ]]; then
   log_status "STEP python created ${REPO_ROOT}/.venv"
   record_cmd "${PYTHON_BIN} -m venv ${REPO_ROOT}/.venv"
@@ -176,7 +206,11 @@ if [[ "${BENCHMARK_INSTALL_STRESS_NG}" == "1" ]]; then
   verify_cmd "stress-ng" stress-ng --version
 fi
 if [[ "${BENCHMARK_INSTALL_PERF}" == "1" ]]; then
-  verify_cmd "perf" perf --version
+  if perf --version >/dev/null 2>&1; then
+    verify_cmd "perf" perf --version
+  else
+    log_status "WARN perf --version failed; PMU metrics may be na"
+  fi
 fi
 
 if [[ -f scripts/build.sh ]]; then
