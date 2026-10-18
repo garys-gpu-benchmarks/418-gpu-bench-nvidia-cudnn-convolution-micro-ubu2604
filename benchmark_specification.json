@@ -37,7 +37,7 @@
   {
     "field_name": "Metrics",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "#1: Convolution kernel execution time, forward (kernel_time_msec); #2: Achieved compute throughput, forward (tflops_fwd); #3: Memory bandwidth, GB/s, forward (memory_bandwidth_gb_s); #4: Solver search time (solver_search_msec), sum of cudnnFind wall time across the directions run"
+    "value": "#1: Convolution kernel execution time, forward (kernel_time_msec); #2: Achieved convolution throughput, forward, TFLOP/s (tflops_fwd); #3: Minimum forward operand traffic, GB/s (min_operand_traffic_gb_s); #4: Solver search time (solver_search_msec), sum of cudnnFind wall time across the directions run"
   },
   {
     "field_name": "Command Tools Executed",
@@ -157,7 +157,7 @@
   {
     "field_name": "Container Base Image",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "N/A - host-native Ubuntu 26.04"
+    "value": "Provider-supplied Ubuntu 26.04 container; CUDA 13.3 toolkit installed by setup"
   },
   {
     "field_name": "Python Version",
@@ -167,12 +167,12 @@
   {
     "field_name": "GPU Runtime Version (was ROCm Version)",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "CUDA 13.3"
+    "value": "CUDA 13.3 (nvcc 13.3.73). Driver 580.159.04 reports CUDA 13.0"
   },
   {
     "field_name": "BLAS Version (was rocBLAS version)",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "N/A - rocBLAS not used"
+    "value": "N/A - cuBLAS not used"
   },
   {
     "field_name": "Mistral-7B Version",
@@ -217,7 +217,7 @@
   {
     "field_name": "g++ Version",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "N/A - CMake not used"
+    "value": "N/A - g++ not used"
   },
   {
     "field_name": "Known Runtime Constraints (<=35 Words Each)",
@@ -362,7 +362,7 @@
   {
     "field_name": "Schema Last Updated",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "2026-08-16"
+    "value": "2026-10-17"
   },
   {
     "field_name": "Installation and Execution Summary",
@@ -377,12 +377,12 @@
   {
     "field_name": "ROCm Version",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "CUDA 13.3"
+    "value": "CUDA 13.3 (nvcc 13.3.73). Driver 580.159.04 reports CUDA 13.0"
   },
   {
     "field_name": "rocBLAS Version",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "N/A - rocBLAS not used"
+    "value": "N/A - cuBLAS not used"
   },
   {
     "field_name": "Execution Summary (Run and Measure)",

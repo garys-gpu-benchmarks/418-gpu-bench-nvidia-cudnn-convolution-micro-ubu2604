@@ -140,14 +140,14 @@ fi
 if [[ "${BENCHMARK_INSTALL_PERF}" == "1" ]]; then
   # linux-tools-generic follows the newest archive kernel and pulls its image
   # and headers. Those postinst scripts build DKMS for a kernel that is not running.
-  apt_install linux-tools-common
+  # A provider kernel that is not in this Ubuntu release has no matching package.
+  # Perf metrics stay na; do not abort setup.
   KERNEL_RELEASE="$(uname -r)"
-  # Cloud kernels are often absent from this Ubuntu archive. The collector
-  # records PMU metrics as na when versioned perf is missing.
   if apt-cache show "linux-tools-${KERNEL_RELEASE}" >/dev/null 2>&1; then
+    apt_install linux-tools-common
     apt_install "linux-tools-${KERNEL_RELEASE}"
   else
-    log_status "WARN linux-tools-${KERNEL_RELEASE} is not in the apt archive; continuing without versioned perf"
+    log_status "WARN linux-tools-${KERNEL_RELEASE} is not in the apt cache; perf metrics stay na"
   fi
 fi
 
@@ -209,7 +209,7 @@ if [[ "${BENCHMARK_INSTALL_PERF}" == "1" ]]; then
   if perf --version >/dev/null 2>&1; then
     verify_cmd "perf" perf --version
   else
-    log_status "WARN perf --version failed; PMU metrics may be na"
+    log_status "WARN perf is not runnable on $(uname -r); perf metrics stay na"
   fi
 fi
 

@@ -38,8 +38,8 @@ check,status,dtype,input_source,conv_direction,batch_size,input_channels,input_h
 ## Metrics
 
 - **#1: Convolution kernel execution time, forward** — stored as `kernel_time_msec`.
-- **#2: Achieved compute throughput, forward** — stored as `tflops_fwd`.
-- **#3: Memory bandwidth, GB/s, forward** — stored as `memory_bandwidth_gb_s`.
+- **#2: Achieved convolution throughput, forward, TFLOP/s** — stored as `tflops_fwd`.
+- **#3: Minimum forward operand traffic, GB/s** — stored as `min_operand_traffic_gb_s`.
 - **#4: Solver search time** — stored as `solver_search_msec`.
 
 ## Framework

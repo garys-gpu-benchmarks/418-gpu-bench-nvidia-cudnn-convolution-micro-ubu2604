@@ -183,16 +183,13 @@ if [[ "${BENCHMARK_INSTALL_NCCL}" == "1" || -f src/nccl_bw.cu ]]; then
 fi
 if [[ "${BENCHMARK_INSTALL_PERF}" == "1" ]]; then
   # linux-tools-generic follows the newest archive kernel. Install tools for
-  # the running kernel when that package is published. A cloud kernel that is
-  # not in this Ubuntu archive has no matching linux-tools package; the
-  # collector then records PMU metrics as na and the workload still runs.
-  log_status "STEP|SETUP apt-get install linux-tools-$(uname -r)"
-  apt_install linux-tools-common || true
+  # the running kernel only. A missing package leaves perf metrics as na.
   if apt-cache show "linux-tools-$(uname -r)" >/dev/null 2>&1; then
+    log_status "STEP|SETUP apt-get install linux-tools-$(uname -r)"
     record_cmd "DEBIAN_FRONTEND=noninteractive apt-get install -y linux-tools-common linux-tools-$(uname -r)"
     DEBIAN_FRONTEND=noninteractive apt-get install -y linux-tools-common "linux-tools-$(uname -r)"
   else
-    log_status "WARN linux-tools-$(uname -r) is not in the apt archive; continuing without versioned perf"
+    log_status "WARN linux-tools-$(uname -r) is not in the apt cache; perf metrics stay na"
   fi
 fi
 
@@ -232,7 +229,11 @@ if [[ "${BENCHMARK_INSTALL_IPERF}" == "1" ]]; then
   verify_cmd "iperf3" iperf3 --version
 fi
 if [[ "${BENCHMARK_INSTALL_PERF}" == "1" ]]; then
-  verify_cmd "perf" perf --version
+  if perf --version >/dev/null 2>&1; then
+    verify_cmd "perf" perf --version
+  else
+    log_status "WARN perf is not runnable on $(uname -r); perf metrics stay na"
+  fi
 fi
 if [[ "${BENCHMARK_INSTALL_NCCL}" == "1" || -f src/nccl_bw.cu ]]; then
   if [[ ! -f /usr/include/nccl.h && ! -f /usr/include/x86_64-linux-gnu/nccl.h ]]; then
