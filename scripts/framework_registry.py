@@ -88,8 +88,7 @@ def _match_any(text: str, needles: list[str]) -> bool:
         token = str(needle).strip().lower()
         if not token:
             continue
-        # Alphanumeric boundaries: "perf" must not match inside "iperf3".
-        if re.search(rf"(^|[^a-z0-9]){re.escape(token)}([^a-z0-9]|$)", blob):
+        if re.search(rf"(^|[,;:\s/]){re.escape(token)}([,;:\s/]|$)", blob) or token in blob:
             return True
     return False
 

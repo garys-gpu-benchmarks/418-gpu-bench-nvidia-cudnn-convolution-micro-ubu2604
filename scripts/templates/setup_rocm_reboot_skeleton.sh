@@ -86,10 +86,17 @@ elif [[ "${AITER_SOURCE_DIR}" != "${REPO_ROOT}/"* ]]; then
   echo "[WARN] Ignoring external AITER_SOURCE_DIR=${AITER_SOURCE_DIR}; using ${REPO_ROOT}/third_party/aiter" >&2
   AITER_SOURCE_DIR="${REPO_ROOT}/third_party/aiter"
 fi
-if ! command -v python3 >/dev/null 2>&1; then
+# Check for Ubuntu's own /usr/bin/python3, not any python3 on PATH: some cloud images
+# activate a virtualenv (for example /root/.venv, Python 3.11) and ship no distro
+# Python, so "command -v python3" succeeded and the version probe asked apt for
+# python3.11-venv, which Ubuntu does not publish.
+if [[ ! -x /usr/bin/python3 ]]; then
   keep_running_kernel
   DEBIAN_FRONTEND=noninteractive apt-get update -y
   DEBIAN_FRONTEND=noninteractive apt-get install -y python3
+fi
+if [[ -z "${BENCHMARK_PYTHON:-}" && -x /usr/bin/python3 ]]; then
+  export BENCHMARK_PYTHON=/usr/bin/python3
 fi
 if [[ -f benchmark_specification.json ]]; then
   workload_framework="$("${PYTHON_BOOTSTRAP:-python3}" - <<'PY'
@@ -782,15 +789,10 @@ if [[ -n "${workload_framework:-}${workload_name:-}" ]]; then
   fi
   if [[ "${BENCHMARK_INSTALL_PERF:-0}" == "1" ]] || grep -Eiq 'linux pmu|linux perf|(^|[^[:alnum:]_])perf([^[:alnum:]_]|$)' <<< "${workload_framework}${workload_name}"; then
     # linux-tools-generic depends on the newest kernel image and headers.
-    # Install linux-tools-$(uname -r) when apt has it. Otherwise perf metrics stay na.
-    if apt-cache show "linux-tools-$(uname -r)" >/dev/null 2>&1; then
-      run_privileged env DEBIAN_FRONTEND=noninteractive apt-get install -y linux-tools-common \
-        "linux-tools-$(uname -r)"
-      install_status_log_step perf "installed linux-tools for the running kernel"
-    else
-      log_warn "linux-tools-$(uname -r) is not in the apt cache; perf metrics stay na"
-      install_status_log_step perf "linux-tools package missing for the running kernel"
-    fi
+    # A missing linux-tools package for this kernel fails the perf workload.
+    run_privileged env DEBIAN_FRONTEND=noninteractive apt-get install -y linux-tools-common \
+      "linux-tools-$(uname -r)"
+    install_status_log_step perf "installed linux-tools for the running kernel"
   fi
 fi
 
