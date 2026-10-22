@@ -21,7 +21,7 @@
 | group_count | `--group-count` | smoke=1, baseline=1, extended=1 | 1 | From Parameter list; see Execution Description With Parameters. |
 | search_strategy | `--search-strategy` | smoke=find, baseline=find, extended=find | find | From Parameter list; see Execution Description With Parameters. |
 | warmup_iters | `--warmup-iters` | smoke=1, baseline=5, extended=10 | 5 | From Parameter list; see Execution Description With Parameters. |
-| num_iterations | `--num-iterations` | smoke=2, baseline=57600, extended=175000 | 57600 | From Parameter list; see Execution Description With Parameters. |
+| num_iterations | `--num-iterations` | smoke=2, baseline=57600, extended=194000 | 57600 | From Parameter list; see Execution Description With Parameters. |
 
 ## Invocation
 

@@ -44,4 +44,4 @@ sweep:
   num_iterations:
     smoke: 2
     baseline: 57600
-    extended: 175000
+    extended: 194000
