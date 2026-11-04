@@ -46,7 +46,6 @@ Validation and logging:
 
 Workload options:
   --dtype <value>            Override dtype
-  --input-source <value>            Override input_source
   --conv-direction <value>            Override conv_direction
   --batch-size <value>            Override batch_size
   --input-channels <value>            Override input_channels
@@ -95,7 +94,6 @@ LOG_LEVEL_VALUE="INFO"
 OUTPUT_FORMAT=""
 SAVE_OPTIONS_FILE=""
 DTYPE=""
-INPUT_SOURCE=""
 CONV_DIRECTION=""
 BATCH_SIZE=""
 INPUT_CHANNELS=""
@@ -131,7 +129,6 @@ while [[ $# -gt 0 ]]; do
     --output-format) OUTPUT_FORMAT="${2:-}"; shift 2 ;;
     --save-options-file) SAVE_OPTIONS_FILE="${2:-}"; shift 2 ;;
     --dtype) DTYPE="${2:-}"; shift 2 ;;
-    --input-source) INPUT_SOURCE="${2:-}"; shift 2 ;;
     --conv-direction) CONV_DIRECTION="${2:-}"; shift 2 ;;
     --batch-size) BATCH_SIZE="${2:-}"; shift 2 ;;
     --input-channels) INPUT_CHANNELS="${2:-}"; shift 2 ;;
@@ -185,7 +182,6 @@ PY
 }
 
 DTYPE="${DTYPE:-$(yaml_get dtype)}"
-INPUT_SOURCE="${INPUT_SOURCE:-$(yaml_get input_source)}"
 CONV_DIRECTION="${CONV_DIRECTION:-$(yaml_get conv_direction)}"
 BATCH_SIZE="${BATCH_SIZE:-$(yaml_get batch_size)}"
 INPUT_CHANNELS="${INPUT_CHANNELS:-$(yaml_get input_channels)}"
@@ -206,7 +202,6 @@ OUTPUT_FORMAT="${OUTPUT_FORMAT:-csv}"
 BENCHMARK_RUN_COMMAND="bash run_benchmark.sh --${PROFILE}"
 [[ "${VALIDATE}" -eq 1 ]] && BENCHMARK_RUN_COMMAND+=" --validate"
 [[ -n "${DTYPE}" ]] && BENCHMARK_RUN_COMMAND+=" --dtype $(printf %q "${DTYPE}")"
-[[ -n "${INPUT_SOURCE}" ]] && BENCHMARK_RUN_COMMAND+=" --input-source $(printf %q "${INPUT_SOURCE}")"
 [[ -n "${CONV_DIRECTION}" ]] && BENCHMARK_RUN_COMMAND+=" --conv-direction $(printf %q "${CONV_DIRECTION}")"
 [[ -n "${BATCH_SIZE}" ]] && BENCHMARK_RUN_COMMAND+=" --batch-size $(printf %q "${BATCH_SIZE}")"
 [[ -n "${INPUT_CHANNELS}" ]] && BENCHMARK_RUN_COMMAND+=" --input-channels $(printf %q "${INPUT_CHANNELS}")"
@@ -264,7 +259,6 @@ run_collection() {
   fi
   grep -q -- '--output-format' <<<"${help}" && collect_args+=(--output-format "${OUTPUT_FORMAT}")
   grep -q -- '--dtype' <<<"${help}" && collect_args+=(--dtype "${DTYPE}")
-  grep -q -- '--input-source' <<<"${help}" && collect_args+=(--input-source "${INPUT_SOURCE}")
   grep -q -- '--conv-direction' <<<"${help}" && collect_args+=(--conv-direction "${CONV_DIRECTION}")
   grep -q -- '--batch-size' <<<"${help}" && collect_args+=(--batch-size "${BATCH_SIZE}")
   grep -q -- '--input-channels' <<<"${help}" && collect_args+=(--input-channels "${INPUT_CHANNELS}")

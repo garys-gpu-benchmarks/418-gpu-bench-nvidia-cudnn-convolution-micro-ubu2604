@@ -7,7 +7,6 @@
 | Parameter | CLI Flag | Tested Values | Default | Description |
 | --- | --- | --- | --- | --- |
 | dtype | `--dtype` | smoke=FP16, baseline=FP16, extended=FP16 | FP16 | From Parameter list; see Execution Description With Parameters. |
-| input_source | `--input-source` | smoke=synthetic, baseline=synthetic, extended=synthetic | synthetic | From Parameter list; see Execution Description With Parameters. |
 | conv_direction | `--conv-direction` | smoke=all, baseline=all, extended=all | all | From Parameter list; see Execution Description With Parameters. |
 | batch_size | `--batch-size` | smoke=1, baseline=32, extended=32 | 32 | From Parameter list; see Execution Description With Parameters. |
 | input_channels | `--input-channels` | smoke=8, baseline=3, extended=3 | 3 | From Parameter list; see Execution Description With Parameters. |

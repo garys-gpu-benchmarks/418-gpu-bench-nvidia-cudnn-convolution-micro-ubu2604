@@ -9,7 +9,6 @@
 sweep:
   profile: smoke
   dtype: FP16
-  input_source: synthetic
   conv_direction: all
   batch_size:
     smoke: 1
