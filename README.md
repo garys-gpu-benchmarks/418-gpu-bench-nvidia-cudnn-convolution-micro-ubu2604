@@ -1,11 +1,13 @@
-# cuDNN Convolution Microbenchmark Benchmark
+# cuDNN Convolution Microbenchmark
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/garys-gpu-benchmarks/418-gpu-bench-nvidia-cudnn-convolution-micro-ubu2604/actions/workflows/ci.yml/badge.svg)](https://github.com/garys-gpu-benchmarks/418-gpu-bench-nvidia-cudnn-convolution-micro-ubu2604/actions/workflows/ci.yml)
 
-Target: Ubuntu 26.04 · NVIDIA · see Hardware Requirements. This is a host benchmark, not a laptop `pip install` project.
+Measures cuDNN convolution solver speed. Workload 418 of the NVIDIA Ubuntu 26.04 bundle.
 
 ## Quick Start
+
+On an Ubuntu 26.04 host, as root or with sudo:
 
 ```bash
 git clone https://github.com/garys-gpu-benchmarks/418-gpu-bench-nvidia-cudnn-convolution-micro-ubu2604.git
@@ -13,221 +15,112 @@ cd 418-gpu-bench-nvidia-cudnn-convolution-micro-ubu2604
 sudo bash setup.sh --assume-yes
 bash run_benchmark.sh --smoke
 ```
-Results are written to `results/benchmark.db` and `results/summary.json`.
 
-This workload is executed on the validation host after the repository is copied there. `setup.sh` and `run_benchmark.sh` do not open an outbound SSH session.
+`run_benchmark.sh` runs setup by itself if it has not been run yet. Each run prints its metrics when it finishes.
 
-Prerequisites: Ubuntu 26.04; NVIDIA; Python 3.14.4; root or sudo for `setup.sh`. Framework: Bash, SQLite, Python, PyYAML, CUDA Runtime, NVCC, cuDNN. This is a host benchmark, not a laptop `pip install` project.
+## Profiles and Parameters
 
-```mermaid
-flowchart LR
-  setup.sh --> run_benchmark.sh --> parse_results.py --> results/benchmark.db
-```
+| Parameter | Flag | smoke | baseline | extended |
+|---|---|---|---|---|
+| `dtype` | `--dtype` | FP16 | FP16 | FP16 |
+| `conv_direction` | `--conv-direction` | all | all | all |
+| `batch_size` | `--batch-size` | 1 | 32 | 32 |
+| `input_channels` | `--input-channels` | 8 | 3 | 3 |
+| `input_height` | `--input-height` | 16 | 224 | 224 |
+| `input_width` | `--input-width` | 16 | 224 | 224 |
+| `output_channels` | `--output-channels` | 8 | 64 | 64 |
+| `kernel_height` | `--kernel-height` | 3 | 3 | 3 |
+| `kernel_width` | `--kernel-width` | 3 | 3 | 3 |
+| `stride_h` | `--stride-h` | 1 | 1 | 1 |
+| `stride_w` | `--stride-w` | 1 | 1 | 1 |
+| `group_count` | `--group-count` | 1 | 1 | 1 |
+| `search_strategy` | `--search-strategy` | find | find | find |
+| `warmup_iters` | `--warmup-iters` | 1 | 5 | 10 |
+| `num_iterations` | `--num-iterations` | 2 | 57600 | 194000 |
 
-## Download as a Bundle
-
-This repository is one of the 32 workloads in the NVIDIA Ubuntu 26.04 bundle, [`bundle-nvidia-ubuntu-2604`](https://github.com/garys-gpu-benchmarks/bundle-nvidia-ubuntu-2604), which holds them as git submodules pinned to a release. To put every workload for this platform on a GPU host in one step, run this as root (or put `sudo` in front of the `apt-get` and `git clone` commands):
-
-```bash
-apt-get update && apt-get install -y git
-git clone --recurse-submodules https://github.com/garys-gpu-benchmarks/bundle-nvidia-ubuntu-2604 /opt/benchmarks \
-  && cd /opt/benchmarks \
-  && ./run_benchmark_suite.sh --list \
-  && cd /opt/benchmarks/418-gpu-bench-nvidia-cudnn-convolution-micro-ubu2604 \
-  && bash run_benchmark.sh --smoke \
-  && cd /opt/benchmarks \
-  && echo "Done: 32 workloads in /opt/benchmarks; 418-gpu-bench-nvidia-cudnn-convolution-micro-ubu2604 smoke run passed. Next: ./run_benchmark_suite.sh --help"
-```
-
-Every line in `./run_benchmark_suite.sh --list` should show `ready`; it exits with an error if any workload is not fetched. The commands are joined with `&&`, so if the clone, the list or the smoke run fails, the chain stops there, and the closing message appears only when everything succeeded. The chain ends in `/opt/benchmarks`, where the suite runner is. For more extensive testing:
+Pick a profile with `--smoke` (default), `--baseline` or `--extended`. Any flag in the table overrides that profile's value:
 
 ```bash
-./run_benchmark_suite.sh --smoke                  # smoke test of all 32 workloads
-./run_benchmark_suite.sh -w 407 --baseline        # workload 407, baseline profile
-./run_benchmark_suite.sh --help                   # all options
+bash run_benchmark.sh --baseline --batch-size 16
+bash run_benchmark.sh --help        # every option
 ```
 
-A workload that is not set up yet sets itself up on its first run (its `run_benchmark.sh` calls `scripts/ensure_setup.sh`). See [Suite Tools](#suite-tools) for more.
+Profile values live in `config/benchmark_config.yaml`.
 
-To move to the newest published release later: `cd /opt/benchmarks && git pull && git submodule update --init --recursive`.
+## Metrics
 
-| Bundle repository | Platform | Workloads |
+| # | Metric | Key |
 |---|---|---|
-| [`bundle-amd-ubuntu-2404`](https://github.com/garys-gpu-benchmarks/bundle-amd-ubuntu-2404) | AMD · Ubuntu 24.04 | 101–132 |
-| [`bundle-nvidia-ubuntu-2404`](https://github.com/garys-gpu-benchmarks/bundle-nvidia-ubuntu-2404) | NVIDIA · Ubuntu 24.04 | 201–232 |
-| [`bundle-amd-ubuntu-2604`](https://github.com/garys-gpu-benchmarks/bundle-amd-ubuntu-2604) | AMD · Ubuntu 26.04 | 301–332 |
-| [`bundle-nvidia-ubuntu-2604`](https://github.com/garys-gpu-benchmarks/bundle-nvidia-ubuntu-2604) | NVIDIA · Ubuntu 26.04 | 401–432 |
+| 1 | Convolution kernel execution time, forward | `kernel_time_msec` |
+| 2 | Achieved convolution throughput, forward, TFLOP/s | `tflops_fwd` |
+| 3 | Minimum forward operand traffic, GB/s | `min_operand_traffic_gb_s` |
+| 4 | Solver search time, sum of cudnnFind wall time across the directions run | `solver_search_msec` |
 
-## Suite Tools
+### Notes
 
-Four operator scripts from [`garys-gpu-benchmarks/gpu-bench-suite`](https://github.com/garys-gpu-benchmarks/gpu-bench-suite) work across the whole bundle. All four are also at the top of every bundle, and `show_metrics.sh` is at the top of this repository too; each script prints full usage with `--help`.
+- The smoke profile is a quick check with reduced sizes and iteration counts. Use `--baseline` or `--extended` for representative numbers.
+- cudnn.h must be on the nvcc default include path.
+- Solver choice varies by shape and dtype; warm-up is recommended.
 
-- **`run_benchmark_suite.sh`** (on the GPU host) — runs the installed workloads one after another for each profile, writes one log to `/opt/benchmarks/benchmark_suite_log/`, and ends with a pass/fail summary.
-  ```bash
-  cd /opt/benchmarks
-  ./run_benchmark_suite.sh --dry-run                    # list what would run
-  ./run_benchmark_suite.sh -w 418 --smoke --baseline  # just this workload
-  ./run_benchmark_suite.sh --smoke                      # every workload, smoke profile
-  ./run_benchmark_suite.sh -r 20                        # soak: everything, 20 times
-  ```
-- **`get_benchmark_results.sh`** (on your laptop with `--host`, or on the GPU host without it) — copies the runtime ledger and every workload's `results/raw`, `results/parsed` and suite logs into `RUNTIME_LEDGERS/` and `DIRECTORIES/`. With `--host` it collects over one SSH connection; without `--host` it collects from the machine it runs on.
-  ```bash
-  git clone https://github.com/garys-gpu-benchmarks/gpu-bench-suite && cd gpu-bench-suite
-  ./scripts/get_benchmark_results.sh --host 203.0.113.10        # root@host, port 22
-  ./scripts/get_benchmark_results.sh --host ubuntu@203.0.113.10 --port 2222 -i ~/.ssh/id_ed25519 -o ~/results
-  /opt/benchmarks/get_benchmark_results.sh -o ~/results     # on the GPU host: this machine
-  ```
-- **`show_ledger_runs.sh`** (on your laptop with `--host`, or on the GPU host without it) — prints one line per run in the runtime ledger (workload, profile, runtime, exit code) and copies nothing. `--failed` lists only runs that did not exit 0.
-  ```bash
-  ./scripts/show_ledger_runs.sh --host 203.0.113.10           # from your laptop
-  /opt/benchmarks/show_ledger_runs.sh --failed            # on the GPU host
-  ```
-- **`show_metrics.sh`** (laptop or GPU host; included in this repository) — prints one workload's runs from the runtime ledger in fixed-width metric columns with per-profile means.
-  ```bash
-  ./show_metrics.sh 418                                        # from this repository, on the GPU host
-  cd /opt/benchmarks && ./show_metrics.sh 418             # or from the bundle
-  ./scripts/show_metrics.sh 418 --host 203.0.113.10            # over SSH, all profiles
-  ./scripts/show_metrics.sh 418 --baseline --file RUNTIME_LEDGERS/<ledger>.csv
-  ```
+## Output
 
-## 1. Overview
-
-Builds src/cudnn_conv.cu (includes <cudnn.h>) into bin/cudnn_conv and times forward/backward convolution on synthetic tensors. dtype default FP16. conv_direction, batch_size, input_channels, input_height/width, output_channels, kernel_height/width, stride_h/w, group_count, search_strategy, warmup_iters, and num_iterations come from yaml. Collector runs the harness twice (pass1/pass2/summary) Sweep dimensions: dtype, conv_direction, batch_size, input_channels, input_height, input_width, output_channels, kernel_height.
-
-## 2. What It Validates
-
-- Validates cuDNN convolution timing and TFLOPS from bin/cudnn_conv. Requires a discoverable cudnn.h and libcudnn
-- #1: Convolution kernel execution time, forward (kernel_time_msec); is present and physically sensible.
-- #2: Achieved convolution throughput, forward, TFLOP/s (tflops_fwd); is present and physically sensible.
-- #3: Minimum forward operand traffic, GB/s (min_operand_traffic_gb_s); is present and physically sensible.
-- #4: Solver search time (solver_search_msec), sum of cudnnFind wall time across the directions run is present and physically sensible.
-
-## 3. Metrics Captured
-
-- **#1: Convolution kernel execution time, forward** — stored as `kernel_time_msec`.
-- **#2: Achieved convolution throughput, forward, TFLOP/s** — stored as `tflops_fwd`.
-- **#3: Minimum forward operand traffic, GB/s** — stored as `min_operand_traffic_gb_s`.
-- **#4: Solver search time** — stored as `solver_search_msec`.
-
-## 4. Hardware Requirements
-
-### Supported environment
-
-- OS: Ubuntu 26.04
-- GPU vendor: NVIDIA
-- Framework family: Bash, SQLite, Python, PyYAML, CUDA Runtime, NVCC, cuDNN
-- Python: Python 3.14.4
-
-### Reference validation environment
-
-The tables below describe the machine used to generate the reference results. They are not a requirement that every user buy that exact cloud instance.
-
-### System
-
-Builds src/cudnn_conv.cu (includes <cudnn.h>) into bin/cudnn_conv and times forward/backward convolution on synthetic tensors. dtype default FP16. conv_direction, batch_size, input_channels, input_height/width, output_channels, kernel_height/width, stride_h/w, group_count, search_strategy, warmup_iters, and num_iterations come from yaml.
-
-### GPU
-
-Ubuntu 26.04 / NVIDIA / Bash, SQLite, Python, PyYAML, CUDA Runtime, NVCC, cuDNN
-
-## 5. Software Requirements
-
-| Component | Version |
+| Path | Contents |
 |---|---|
-| OS | Ubuntu 26.04 |
-| Kernel | kernel 7.0.0 |
-| Python | Python 3.14.4 |
-| ROCm | CUDA 13.3 (nvcc 13.3.73). Driver 580.159.04 reports CUDA 13.0 |
-| rocBLAS | N/A - cuBLAS not used |
+| `results/raw/<timestamp>_<repo>_<host>/` | Raw tool output, `metrics_summary.txt`, and `hardware_info.txt`, `software_info.txt`, `errors_info.txt` |
+| `results/benchmark.db` | SQLite history of every run |
+| `results/summary.json` | Metrics from the most recent run |
+| `/var/opt/benchmarks/runtime_ledger.csv` | One row per run, shared by every workload on the host |
 
-Builds src/cudnn_conv.cu (includes <cudnn.h>) into bin/cudnn_conv and times forward/backward convolution on synthetic tensors. dtype default FP16. conv_direction, batch_size, input_channels, input_height/width, output_channels, kernel_height/width, stride_h/w, group_count, search_strategy, warmup_iters, and num_iterations come from yaml.
+Every run is checked for completeness and against any `thresholds:` or `baselines:` in `config/benchmark_config.yaml`. A run that fails the checks exits non-zero.
 
-## 6. Installation
+## Requirements
 
-```bash
-Compile cudnn_conv.cu with nvcc -lcudnn; run bin/cudnn_conv twice via collect_cudnn_conv.py
-```
+- Ubuntu 26.04, root or sudo for `setup.sh`
+- NVIDIA GPU with CUDA 13.3 (validated on H100 SXM 80GB)
+- CUDA Runtime, NVCC, cuDNN, Python 3.14. `setup.sh` installs what is missing; Python packages go into a repo-local `.venv`.
 
-## 7. Running the Benchmark
+## Run the Whole Bundle
 
-```bash
-Compile cudnn_conv.cu with nvcc -lcudnn; run bin/cudnn_conv twice via collect_cudnn_conv.py
-```
-
-**Validating results separately:**
+This workload is also part of [`bundle-nvidia-ubuntu-2604`](https://github.com/garys-gpu-benchmarks/bundle-nvidia-ubuntu-2604), which holds all 32 NVIDIA Ubuntu 26.04 workloads as submodules:
 
 ```bash
-export BENCHMARK_PYTHON=/usr/bin/python3.13  # optional
-python3 -m venv .venv
-source ".venv/bin/activate"
-".venv/bin/python" scripts/validate_results.py
+git clone --recurse-submodules https://github.com/garys-gpu-benchmarks/bundle-nvidia-ubuntu-2604 /opt/benchmarks
+cd /opt/benchmarks
+./run_benchmark_suite.sh -w 418 --smoke     # just this workload
+./run_benchmark_suite.sh --smoke            # all 32 workloads
+./show_metrics.sh 418                       # this workload's runs from the ledger
 ```
 
-## 8. Output
+The suite tools (`run_benchmark_suite.sh`, `get_benchmark_results.sh`, `show_ledger_runs.sh`, `show_metrics.sh`) are documented in [`gpu-bench-suite`](https://github.com/garys-gpu-benchmarks/gpu-bench-suite).
 
-### `results/benchmark.db` (SQLite)
+Other platforms: [AMD 24.04](https://github.com/garys-gpu-benchmarks/bundle-amd-ubuntu-2404) (101–132), [NVIDIA 24.04](https://github.com/garys-gpu-benchmarks/bundle-nvidia-ubuntu-2404) (201–232), [AMD 26.04](https://github.com/garys-gpu-benchmarks/bundle-amd-ubuntu-2604) (301–332).
 
-cuDNN convolution CSV from collect_cudnn_conv.py. Forward and both backward directions share one row
+## Troubleshooting
 
-check,status,dtype,input_source,conv_direction,batch_size,input_channels,input_height,input_width,output_channels,kernel_height,kernel_width,stride_h,stride_w,group_count,search_strategy,warmup_iters,num_iterations,pad_h,pad_w,dtype_effective,kernel_time_msec,tflops_fwd,tflops_bwd_data,tflops_bwd_weights,solver_search_msec,memory_bandwidth_gb_s,kernel_time_msec_bwd_data,kernel_time_msec_bwd_weights,memory_bandwidth_gb_s_bwd_data,memory_bandwidth_gb_s_bwd_weights,algo_fwd,algo_bwd_data,algo_bwd_weights
+- **SSH dropped during setup:** reconnect and run `sudo bash setup.sh --assume-yes` again. It resumes; do not delete `.venv` or `.cache`.
+- **A metric reads `na`:** the run could not measure it on this host. The reason is in the run's `metrics_summary.txt` and `errors_info.txt`; see also [Notes](#notes).
 
-```bash
-Compile cudnn_conv.cu with nvcc -lcudnn; run bin/cudnn_conv twice via collect_cudnn_conv.py
-```
-
-### `results/summary.json`
-
-Consolidated metrics from the most recent run — suitable for CI artifact upload or dashboard ingestion.
-
-### `results/raw/<timestamp>.txt`
-
-cuDNN convolution CSV from collect_cudnn_conv.py. Forward and both backward directions share one row
-
-check,status,dtype,input_source,conv_direction,batch_size,input_channels,input_height,input_width,output_channels,kernel_height,kernel_width,stride_h,stride_w,group_count,search_strategy,warmup_iters,num_iterations,pad_h,pad_w,dtype_effective,kernel_time_msec,tflops_fwd,tflops_bwd_data,tflops_bwd_weights,solver_search_msec,memory_bandwidth_gb_s,kernel_time_msec_bwd_data,kernel_time_msec_bwd_weights,memory_bandwidth_gb_s_bwd_data,memory_bandwidth_gb_s_bwd_weights,algo_fwd,algo_bwd_data,algo_bwd_weights
-
-## 9. Baselines / Thresholds
-
-Expected ranges and gates live in `config/benchmark_config.yaml` under `baselines:` or `thresholds:`. To update them, edit that file — never edit validation code directly.
-
-## 10. Troubleshooting
-
-**`setup.sh` missing collector**
-Create cannot finish without `scripts/collect_workload.py`.
-
-**`self_check` overlay rewritten**
-`Locked overlay rewritten` means the sibling file and the `sha256` in `results/overlay_lock.json` disagree. The repair is to make `implementation_components/<component-id>/files/<path>`, the sibling path, and that digest the same bytes, then recheck with `create_one_workload.py --validate-only`. Do not replace the overlay with a new collector, and do not regenerate a non-empty sibling.
-
-**Remote SSH drop during setup**
-Reconnect and resume `bash setup.sh --assume-yes`. Do not wipe `.venv` or `.cache`.
-
-## 11. NVIDIA H100 Coding Differences
-
-Native NVIDIA CUDA workload. Execute on the stated Ubuntu release with the host NVIDIA driver and CUDA userspace. ROCm porting notes do not apply.
-
-## Repository layout
+## Repository Layout
 
 ```text
 .
-├── setup.sh
-├── run_benchmark.sh
-├── benchmark_specification.json
-├── .github/workflows/      # thin CI callers (see Continuous Integration)
-├── config/
-├── scripts/
-├── src/
+├── setup.sh                      # installs dependencies and builds the benchmark
+├── run_benchmark.sh              # runs one profile, parses, validates
+├── show_metrics.sh               # prints this workload's ledger rows
+├── SPEC.md                       # engineering specification
+├── benchmark_specification.json  # workload definition
+├── config/                       # profile values and thresholds
+├── src/cudnn_conv.cu             # benchmark source
+├── scripts/                      # build, collect, parse, validate
+├── docs/                         # PRD and contracts
 ├── tests/
-├── docs/
-├── results/
+├── results/                      # run outputs
 └── LICENSE
 ```
 
 ## Continuous Integration
 
-| Workflow | Runs on | When | What it does |
-|---|---|---|---|
-| [CI](.github/workflows/ci.yml) | GitHub-hosted runner | every pull request, and every push to `main` | shellcheck, ruff, `bash -n`, `compileall`, `run_benchmark.sh --help`, specification schema, the results validator on a seeded fixture, required files, and actionlint. No GPU and no benchmark run. |
-| [GPU Smoke Benchmark](.github/workflows/gpu-smoke.yml) | self-hosted runner labeled `gpu`, `nvidia`, `ubu2604` | only when started by hand: **Actions → GPU Smoke Benchmark → Run workflow** (choose `smoke`, `baseline` or `extended`) | Verifies the pre-provisioned GPU stack, records `results/environment.json` (driver, runtime, kernel, GPU), runs the profile, shows headline metrics on the run page, and uploads the results. |
+- [CI](.github/workflows/ci.yml) runs lint and static checks on every pull request and push to `main`. It does not run the benchmark.
+- [GPU Smoke Benchmark](.github/workflows/gpu-smoke.yml) runs a profile on a self-hosted runner labeled `gpu`, `nvidia`, `ubu2604`. It only starts by hand (**Actions → GPU Smoke Benchmark → Run workflow**), so pull requests and forks cannot run it.
 
-Both files are short callers. The steps themselves live once, for every workload in the suite, in [`garys-gpu-benchmarks/shared-workflows`](https://github.com/garys-gpu-benchmarks/shared-workflows), pinned at `@v1`. The GPU workflow is never triggered by pull requests, so code from a fork cannot run on the GPU host.
-
-The GPU Smoke Benchmark workflow runs one workload. To install and run the whole NVIDIA Ubuntu 26.04 bundle by hand on the same machines, see [Download as a Bundle](#download-as-a-bundle) and [Suite Tools](#suite-tools).
+Both workflows call shared steps in [`shared-workflows@v1`](https://github.com/garys-gpu-benchmarks/shared-workflows).
