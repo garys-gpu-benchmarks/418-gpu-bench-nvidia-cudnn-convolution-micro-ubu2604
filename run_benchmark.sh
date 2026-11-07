@@ -30,9 +30,12 @@ Profiles (default: --smoke):
   --extended                    Run extended profile
 
 Parameters (override the profile's value):
-  --dtype <value>               Tensor, element, or storage data type (smoke/baseline/extended: FP16)
+  --dtype <value>               Tensor, element, or storage data type
+                                  all profiles: FP16
   --conv-direction <value>      Shared workload parameter (smoke/baseline/extended: all)
-  --batch-size <n>              Number of items processed together (smoke 1, baseline 32, extended 32)
+  --batch-size <n>              Number of items processed together
+                                  smoke:             1
+                                  baseline/extended: 32
   --input-channels <value>      Shared workload parameter (smoke 8, baseline 3, extended 3)
   --input-height <value>        Shared workload parameter (smoke 16, baseline 224, extended 224)
   --input-width <value>         Shared workload parameter (smoke 16, baseline 224, extended 224)
@@ -43,8 +46,14 @@ Parameters (override the profile's value):
   --stride-w <value>            Shared workload parameter (smoke/baseline/extended: 1)
   --group-count <value>         Shared workload parameter (smoke/baseline/extended: 1)
   --search-strategy <value>     Shared workload parameter (smoke/baseline/extended: find)
-  --warmup-iters <n>            Untimed warm-up repetitions before measurement (smoke 1, baseline 5, extended 10)
-  --num-iterations <n>          Number of timed repetitions (smoke 2, baseline 57600, extended 194000)
+  --warmup-iters <n>            Untimed warm-up repetitions before measurement
+                                  smoke:    1
+                                  baseline: 5
+                                  extended: 10
+  --num-iterations <n>          Number of timed repetitions
+                                  smoke:    2
+                                  baseline: 57600
+                                  extended: 194000
 
 General options:
   --config <file>               Config file (default: config/benchmark_config.yaml)
