@@ -16,12 +16,11 @@ capture_benchmark_run_command_submitted "$@"
 
 usage() {
   cat <<'USAGE'
+
 Usage: bash run_benchmark.sh [OPTIONS]
 
 Workload Name:          cuDNN Convolution Microbenchmark.
 Main Goal:              Measure cuDNN convolution solver speed.
-Validation Objective:   Validates cuDNN convolution timing and TFLOPS from bin/cudnn_conv. Requires
-                        a discoverable cudnn.h and libcudnn.
 Command Tools Executed: Compile cudnn_conv.cu with nvcc -lcudnn; run bin/cudnn_conv twice via
                         collect_cudnn_conv.py.
 
