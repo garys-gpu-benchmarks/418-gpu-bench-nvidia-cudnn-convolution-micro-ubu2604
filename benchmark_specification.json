@@ -202,17 +202,17 @@
   {
     "field_name": "GPU Model",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "H100 SXM 80GB"
-  },
-  {
-    "field_name": "Raw Output Format",
-    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "cuDNN convolution CSV from collect_cudnn_conv.py. Forward and both backward directions share one row"
+    "value": "--"
   },
   {
     "field_name": "Primary Record Granularity",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "one row for the convolution configuration"
+  },
+  {
+    "field_name": "Raw Output Format",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "cuDNN convolution CSV from collect_cudnn_conv.py. Forward and both backward directions share one row"
   },
   {
     "field_name": "Raw Output Example",
@@ -225,19 +225,19 @@
     "value": "kernel_time_msec, tflops_fwd, tflops_bwd_data, tflops_bwd_weights, solver_search_msec, memory_bandwidth_gb_s, kernel_time_msec_bwd_data, kernel_time_msec_bwd_weights, memory_bandwidth_gb_s_bwd_data, memory_bandwidth_gb_s_bwd_weights, algo_fwd, algo_bwd_data, algo_bwd_weights, dtype_effective"
   },
   {
-    "field_name": "Success Criteria",
-    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "Both timed passes exit 0 and the summary row has positive forward kernel time and TFLOPS"
-  },
-  {
     "field_name": "Parser and Normalization Notes",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "RESULT lines fill one wide row. Forward, backward-data, and backward-weight times and bandwidths share that row. pass1, pass2, and summary are the two passes plus their mean"
   },
   {
+    "field_name": "Success Criteria",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Both timed passes exit 0 and the summary row has positive forward kernel time and TFLOPS"
+  },
+  {
     "field_name": "Hardware Config",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "NVIDIA H100 SXM host (20+ vCPUs, 128+ GB RAM, local NVMe), 1x H100 SXM (80 GB HBM3, sm_90, 132 SMs)"
+    "value": "Cloud GPU host such as a RunPod Pod (20+ vCPUs, 128+ GB RAM, local NVMe), 1x NVIDIA data-center GPU (80+ GB HBM; model varies by provider)"
   },
   {
     "field_name": "GPU Architecture",

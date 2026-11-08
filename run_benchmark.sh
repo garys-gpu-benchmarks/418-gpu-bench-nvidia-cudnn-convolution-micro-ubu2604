@@ -19,10 +19,10 @@ usage() {
 
 Usage: bash run_benchmark.sh [OPTIONS]
 
-Workload Name:          cuDNN Convolution Microbenchmark.
-Main Goal:              Measure cuDNN convolution solver speed.
+Workload Name:          cuDNN Convolution Microbenchmark
+Main Goal:              Measure cuDNN convolution solver speed
 Command Tools Executed: Compile cudnn_conv.cu with nvcc -lcudnn; run bin/cudnn_conv twice via
-                        collect_cudnn_conv.py.
+                        collect_cudnn_conv.py
 
 Profiles (default: --smoke):
   --smoke                       Run smoke profile
