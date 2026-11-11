@@ -76,7 +76,7 @@ Every run is checked for completeness and against any `thresholds:` or `baseline
 ## Requirements
 
 - Ubuntu 26.04, root or sudo for `setup.sh`
-- NVIDIA GPU with CUDA 13.3
+- NVIDIA GPU with CUDA 13.3 (validated on H100)
 - CUDA Runtime, NVCC, cuDNN, Python 3.14. `setup.sh` installs what is missing; Python packages go into a repo-local `.venv`.
 
 ## Run the Whole Bundle

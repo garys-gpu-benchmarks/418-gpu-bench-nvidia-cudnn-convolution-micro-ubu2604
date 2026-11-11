@@ -202,7 +202,7 @@
   {
     "field_name": "GPU Model",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "--"
+    "value": "H100"
   },
   {
     "field_name": "Primary Record Granularity",
