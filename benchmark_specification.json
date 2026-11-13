@@ -40,6 +40,11 @@
     "value": "Compile cudnn_conv.cu with nvcc -lcudnn; run bin/cudnn_conv twice via collect_cudnn_conv.py"
   },
   {
+    "field_name": "Execution Description With Parameters",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Builds src/cudnn_conv.cu (includes <cudnn.h>) into bin/cudnn_conv and times forward/backward convolution on synthetic tensors. dtype default FP16. conv_direction, batch_size, input_channels, input_height/width, output_channels, kernel_height/width, stride_h/w, group_count, search_strategy, warmup_iters, and num_iterations come from yaml. Collector runs the harness twice (pass1/pass2/summary)"
+  },
+  {
     "field_name": "Metrics",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "#1: Convolution kernel execution time, forward (kernel_time_msec); #2: Achieved convolution throughput, forward, TFLOP/s (tflops_fwd); #3: Minimum forward operand traffic, GB/s (min_operand_traffic_gb_s); #4: Solver search time (solver_search_msec), sum of cudnnFind wall time across the directions run"
@@ -173,11 +178,6 @@
     "field_name": "Command Methodology",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "Compile src/cudnn_conv.cu with nvcc -lcudnn and run bin/cudnn_conv twice. For forward, backward-data, and backward-weights, time cudnnFind and the selected FP16 tensor-op kernel. The headline kernel time, forward TFLOPS, and bandwidth are the forward direction"
-  },
-  {
-    "field_name": "Execution Description With Parameters",
-    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "Builds src/cudnn_conv.cu (includes <cudnn.h>) into bin/cudnn_conv and times forward/backward convolution on synthetic tensors. dtype default FP16. conv_direction, batch_size, input_channels, input_height/width, output_channels, kernel_height/width, stride_h/w, group_count, search_strategy, warmup_iters, and num_iterations come from yaml. Collector runs the harness twice (pass1/pass2/summary)"
   },
   {
     "field_name": "Execution Domain",
