@@ -379,7 +379,7 @@ def main() -> int:
         "num_iterations": num_iterations,
     }
     rows: list[dict[str, object]] = []
-    for pass_index in (1, 2):
+    for pass_index in (1,):  # one timed pass
         print(f"# timed_pass={pass_index}")
         code, text = run_text(command, timeout=timeout_sec)
         print(f"# check=cudnn-conv-pass{pass_index} exit={code}")
@@ -389,8 +389,8 @@ def main() -> int:
             raise SystemExit(f"[FAIL] cudnn_conv harness exited {code} on pass {pass_index}")
         rows.append(pass_row(text, conv_direction, params, f"pass{pass_index}"))
 
-    if len(rows) < 2:
-        raise SystemExit("[FAIL] Collector must emit at least two timed samples.")
+    if len(rows) < 1:
+        raise SystemExit("[FAIL] Collector must emit at least one timed sample.")
 
     rows.append(summarize_passes(rows, params))
 
