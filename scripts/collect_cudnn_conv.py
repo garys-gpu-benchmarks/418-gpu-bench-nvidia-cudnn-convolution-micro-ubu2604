@@ -397,14 +397,11 @@ def main() -> int:
     fieldnames = ["check", "status", *PARAM_FIELDS, *METRIC_FIELDS]
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    print("# METRICS_CSV")
     with output_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames, lineterminator="\n", extrasaction="ignore")
         writer.writeheader()
         writer.writerows(rows)
         handle.flush()
-    with output_path.open(encoding="utf-8") as handle:
-        print(handle.read(), end="")
     return 0
 
 
