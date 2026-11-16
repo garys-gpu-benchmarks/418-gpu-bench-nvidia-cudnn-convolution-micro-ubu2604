@@ -70,6 +70,17 @@ def _cli_flag(name: str) -> str:
     return "--" + re.sub(r"[^A-Za-z0-9]+", "-", name).strip("-").lower()
 
 
+def _parameter_description(name: str, exec_desc: str) -> str:
+    # 103/303 record gpu_load_percent and run the GEMM at full utilization.
+    # The phrase lives in the workbook execution description; the table repeats it.
+    if name == "gpu_load_percent" and "requested 50%, delivered ~100%" in exec_desc:
+        return (
+            "Recorded, not a duty cycle. The AMD load is one rocblas-bench hot loop "
+            "at full GPU utilization: requested 50%, delivered ~100%."
+        )
+    return "From Parameter list; see Execution Description With Parameters."
+
+
 def _profile_cell(values: dict, name: str) -> tuple[str, str]:
     if not values:
         return "TBD — confirm against tool documentation", "TBD — confirm against tool documentation"
@@ -153,7 +164,7 @@ def expand_generate(instruction: str, fields: dict[str, str], repo: Path | None 
             tested, default = _profile_cell(profiles, name)
             lines.append(
                 f"| {name} | `{_cli_flag(name)}` | {tested} | {default} | "
-                f"From Parameter list; see Execution Description With Parameters. |"
+                f"{_parameter_description(name, exec_desc)} |"
             )
         if len(lines) == 2:
             return "No workbook parameters are populated for this workload."
